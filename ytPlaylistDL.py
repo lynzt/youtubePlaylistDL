@@ -96,6 +96,7 @@ def getPlaylistVideoUrls(page_content, url):
 
     if vid_url_matches:
         final_vid_urls = getFinalVideoUrl(vid_url_matches)
+        print (final_vid_urls)
         print("Found",len(final_vid_urls),"videos in playlist.")
         printUrls(final_vid_urls)
         return final_vid_urls
@@ -114,29 +115,38 @@ def download_Video_Audio(path, vid_url, file_no):
         print("Error:", str(e), "- Skipping Video with url '"+vid_url+"'.")
         return
 
+    # print (yt.streams.all())
     try:  # Tries to find the video in 720p
-        video = yt.get('mp4', '720p')
+        video = yt.streams.filter(file_extension='mp4', res='720p').all()
+        # video = yt.get('mp4', '720p')
     except Exception:  # Sorts videos by resolution and picks the highest quality video if a 720p video doesn't exist
         video = sorted(yt.filter("mp4"), key=lambda video: int(video.resolution[:-1]), reverse=True)[0]
+    
+    
+    # print (dir(yt))
+    video = video[0]
+    # download(output_path=None, filename=None, filename_prefix=None)
 
-    print("downloading", yt.filename+" Video and Audio...")
+    print("downloading", yt.title+" Video and Audio...")
     try:
-        bar = progressBar()
-        video.download(path, on_progress=bar.print_progress, on_finish=bar.print_end)
-        print("successfully downloaded", yt.filename, "!")
+        # bar = progressBar()
+        # video.download(path, on_progress=bar.print_progress, on_finish=bar.print_end)
+        video.download(path)
+        # print("successfully downloaded", yt.title, "!")
     except OSError:
-        print(yt.filename, "already exists in this directory! Skipping video...")
-
+        print(yt.title, "already exists in this directory! Skipping video...")
+# 
     try:
-        os.rename(yt.filename+'.mp4',str(file_no)+'.mp4')
+        fixed_title = yt.title.replace('/', ":")
+        os.rename(fixed_title+'.mp4',str(file_no)+'.mp4')
         aud= 'ffmpeg -i '+str(file_no)+'.mp4'+' '+str(file_no)+'.wav'
         final_audio='lame '+str(file_no)+'.wav'+' '+str(file_no)+'.mp3'
         os.system(aud)
-        os.system(final_audio)
+        # os.system(final_audio)
         os.remove(str(file_no)+'.wav')
-        print("sucessfully converted",yt.filename, "into audio!")
+        # print("sucessfully converted",fixed_title, "into audio!")
     except OSError:
-        print(yt.filename, "There is some problem with the file names...")
+        print(yt.title, "There is some problem with the file names...")
  
 
 def printUrls(vid_urls):
