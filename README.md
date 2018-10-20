@@ -2,13 +2,10 @@
 A simple script to download all videos in a youtube playlist (720p quality)
 
 ### Requirements:
-
+pytube
 
 #####**This script needs Python 3.4.1+**
 
-```bash
-$ pip3 install pytube
-```
 
 ### Usage:
 
@@ -28,3 +25,11 @@ https://www.youtube.com/playlist?list=PLVJcUspOFG-Np-YotXlPviRUK_MKyvwId, and pu
 ```bash
 $ python ytPlaylistDL.py https://www.youtube.com/playlist?list=PLVJcUspOFG-Np-YotXlPviRUK_MKyvwId ~/Music/FOMH
 ```
+
+
+docker build -t py/yt-dl .
+
+
+docker run -it --rm \
+  -v "$PWD":/usr/src/app \
+  py/yt-dl python3 ./ytPlaylistDL.py 'https://www.youtube.com/playlist?list=PLjGUJgPl22bgutDgjgeQDQMZgAR9100Xj' ~/test
